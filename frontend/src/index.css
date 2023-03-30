@@ -49,6 +49,7 @@ input {
 }
 
 input {
+
   width: 80%;
   font-weight: bold;
 }
@@ -109,4 +110,6 @@ input:hover {
     min-width: 150px;
   }
 }
+
+
 

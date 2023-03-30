@@ -1,36 +1,48 @@
-import React from 'react'
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react'
+
+import { editImage } from '../Utils/utilFunctions';
 
 
-export default function Edit() {
-
-
+export default function Edit(props) {
+    // //console.log(props.prompt);
+    const [imageFlag, setImageFlag] = useState(false);
+    const [originalBase64, setOriginalBase64] = useState();
 
     const fileSelected = (event) => {
-        const file = event.target.files[0]
-        console.log(file);
+        const file = event.target.files
         const img = new Image()
-        img.src = URL.createObjectURL(file)
+
+        const [imageFile] = file;
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            const srcData = fileReader.result;
+            setOriginalBase64(srcData)
+        };
+        fileReader.readAsDataURL(imageFile);
+        img.src = URL.createObjectURL(file[0])
         img.onload = () => {
-            if (img.width !== img.height) {
-                const minVal = Math.min(img.width, img.height)
-                setup(img, 0, 0, minVal, minVal)
-            } else {
-                setup(img, 0, 0, img.width, img.height)
-            }
+
+            setup(img, 0, 0, img.width, img.height)
+            const originalNode = document.getElementById("original-image")
+            originalNode.src = img.src;
+            setImageFlag(true);
+
         }
     }
 
     const setup = (img, x, y, width, height) => {
         const node = document.getElementById("PictureLayer");
-        
         if (node && node.parentNode) {
             node.parentNode.removeChild(node);
         }
 
+
         var can = document.createElement('canvas');
         can.id = "PictureLayer"
-        can.width = window.innerWidth /5
-        can.height = window.innerWidth /5
+        can.width = window.innerWidth / 3
+        can.height = window.innerWidth / 3
+
         can.style = 'margin:auto;'
         const outerCanvas = document.getElementById('outer-canvas')
         outerCanvas.appendChild(can)
@@ -45,11 +57,11 @@ export default function Edit() {
         const startDrawing = (event) => {
             isDrawing = true
             const pos = getPos(event)
-            console.log('start erasing', pos)
+            //console.log('start erasing', pos)
             points.setStart(pos.x, pos.y)
         }
         const stopDrawing = () => {
-            console.log('stop erasing')
+            //console.log('stop erasing')
             isDrawing = false
         }
         const draw = (event) => {
@@ -119,35 +131,39 @@ export default function Edit() {
     var originalImage = null
     const setOriginalImage = (img) => {
         originalImage = img
-        console.log(img);
-    }
-    const downloadOriginal = () => {
-        console.log('download original')
-        const node = document.getElementById("PictureLayer")
-        if (!node) return
-        var link = document.createElement('a')
-        link.download = 'original.png'
-        link.href = originalImage
-        link.click()
+        // //console.log(img);
     }
 
-    const downloadMask = () => {
-        console.log('download mask')
-        const node = document.getElementById("PictureLayer")
-        if (!node) return
-        var link = document.createElement('a')
-        link.download = 'mask.png'
-        link.href = node.toDataURL()
-        link.click()
+
+    const sendMaskOriginal = async () => {
+
+        const maskNode = document.getElementById("PictureLayer").toDataURL().split(",")[1];
+
+        const res = await editImage(maskNode, originalBase64, props.prompt)
+        props.getEdited(res)
+        props.setLoading(false)
+        // //console.log(res);
+
+
     }
 
     return (
         <>
             <input type="file" accept="image/*" onChange={fileSelected} />
-            <div id='outer-canvas' />
+            <div className='image-container'>
+                <div className='mask-container'>
+                    <div id='outer-canvas' />
+                    {imageFlag ? <h3 style={{ "color": "white" }}>Mask the Area You want to Edit !</h3> : <></>}
+                </div>
+            </div>
             <div>
-                <button onClick={downloadMask}>MASK</button>
-                <button onClick={downloadOriginal}>ORIGINAL</button>
+                {/* <button onClick={downloadMask}>MASK</button>
+                <button onClick={downloadOriginal}>ORIGINAL</button> */}
+                <button onClick={() => {
+                    props.setLoading(true)
+                    props.setEdit(false)
+                    sendMaskOriginal()
+                }} >GET EDITED IMAGE</button>
             </div>
         </>
 

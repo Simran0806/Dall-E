@@ -9,6 +9,7 @@ bcrypt==3.2.0
 blinker==1.4
 Brlapi==0.8.3
 certifi==2021.5.30
+cffi==1.15.1
 chardet==4.0.0
 charset-normalizer==3.1.0
 chrome-gnome-shell==0.0.0
@@ -64,6 +65,7 @@ protobuf==3.12.4
 ptyprocess==0.7.0
 pycairo==1.20.1
 pycodestyle==2.10.0
+pycparser==2.21
 pycups==2.0.1
 Pygments==2.11.2
 PyGObject==3.42.1

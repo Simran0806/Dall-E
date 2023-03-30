@@ -108,6 +108,20 @@
 }
 
 
+.image-container{
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.mask-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
 
 @keyframes animate {
 

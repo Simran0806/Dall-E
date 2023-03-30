@@ -19,18 +19,25 @@ export const generateImage = async (prompt) => {
 };
 
 
-export const editImage = async () => {
+export const editImage = async (img, mask, prompt) => {
     try {
+
+        if (!prompt) {
+            alert("Please enter a valid prompt");
+            return;
+        }
         console.log("wait");
-        const response = await openai.createImageEdit(
-            img,
-            mask,
-            "make the sky as a galaxy",
-            1,
-            "256x256"
-        );
-        let image_url = response.data.data[0].url;
-        console.log(image_url);
+        console.log(img);
+        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        console.log(mask.split(",")[1]);
+        mask = mask.split(",")[1]
+
+
+        const response = await axios.post("http://localhost:8888/edit", { img, mask, prompt });
+
+        console.log(response.data.url);
+        return response.data.url
+
     } catch (error) {
         console.log(error);
     }
